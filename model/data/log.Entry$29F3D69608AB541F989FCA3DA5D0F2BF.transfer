@@ -1,0 +1,677 @@
+<cffunction name="init" access="public" returntype="transfer.com.TransferObject" default="transfer.com.TransferObject" hint="Constructor for Transfer class log.Entry" output="false">
+<cfargument name="transfer" type="transfer.com.Transfer" required="true" hint="The Transfer library">
+<cfargument name="utility" type="transfer.com.util.Utility" required="true" hint="The Utility object">
+<cfargument name="nullable" type="transfer.com.sql.Nullable" required="true" hint="The Nullable lookup object">
+<cfargument name="thisObject" type="transfer.com.TransferObject" required="true" hint="What is determined to be the base 'this' object for this TransferObject">
+<cfscript>
+instance = StructNew();
+setThisObject(arguments.thisObject);
+setTransfer(arguments.transfer);
+setUtility(arguments.utility);
+setSystem(createObject("java", "java.lang.System"));
+setNullable(arguments.nullable);
+setClassName("log.Entry");
+setIsDirty(true);
+setIsPersisted(false);
+setIsClone(false);
+setlog_id(getNullable().getNullNumeric(getClassName(), "log_id"));
+setdescription("");
+setdateAdded(Now());
+setdateUpdated(Now());
+setlogDate(Now());
+sethours(0);
+setLoaded(StructNew());
+setUserisLoaded(true);
+setClientisLoaded(true);
+setProjectisLoaded(true);
+if(StructKeyExists(this, "configure") OR StructKeyExists(variables, "configure"))
+{
+configure();
+}
+return this;
+</cfscript>
+</cffunction>
+
+<cffunction name="equalsTransfer" access="public" returntype="boolean" default="boolean" hint="If an object is persisted, returns true if they are of the same class and same id. If not, returns true if they are the same object." output="false">
+<cfargument name="transfer" type="transfer.com.TransferObject" required="true" hint="The TransferObject to test against">
+<cfscript>
+if(getIsPersisted())
+{
+if(getClassName() neq arguments.transfer.getClassName())
+{
+return false;
+}
+return (getlog_id() eq arguments.transfer.getlog_id());
+}
+else
+{
+return sameTransfer(arguments.transfer);
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="getlog_id" access="public" returntype="numeric" default="numeric" hint="Accessor for property log_id" output="false">
+<cfscript>
+return instance.log_id;
+</cfscript>
+</cffunction>
+
+<cffunction name="setlog_id" access="public" returntype="void" default="void" hint="Mutator for property log_id" output="false">
+<cfargument name="log_id" type="numeric" required="true" hint="The value to set log_id to">
+<cfscript>
+if(NOT StructKeyExists(instance, "log_id") OR getlog_id() neq arguments.log_id)
+{
+instance.log_id = getUtility().trimZero(arguments.log_id);
+setIsDirty(true);
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="getdescription" access="public" returntype="string" default="string" hint="Accessor for property description" output="false">
+<cfscript>
+return instance.description;
+</cfscript>
+</cffunction>
+
+<cffunction name="setdescription" access="public" returntype="void" default="void" hint="Mutator for property description" output="false">
+<cfargument name="description" type="string" required="true" hint="The value to set description to">
+<cfscript>
+if(NOT StructKeyExists(instance, "description") OR Compare(getdescription(), arguments.description) neq 0)
+{
+instance.description = (arguments.description);
+setIsDirty(true);
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="getdateAdded" access="public" returntype="date" default="date" hint="Accessor for property dateAdded" output="false">
+<cfscript>
+return instance.dateAdded;
+</cfscript>
+</cffunction>
+
+<cffunction name="setdateAdded" access="public" returntype="void" default="void" hint="Mutator for property dateAdded" output="false">
+<cfargument name="dateAdded" type="date" required="true" hint="The value to set dateAdded to">
+<cfscript>
+if(NOT StructKeyExists(instance, "dateAdded") OR getdateAdded() neq arguments.dateAdded)
+{
+instance.dateAdded = (arguments.dateAdded);
+setIsDirty(true);
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="getdateUpdated" access="public" returntype="date" default="date" hint="Accessor for property dateUpdated" output="false">
+<cfscript>
+return instance.dateUpdated;
+</cfscript>
+</cffunction>
+
+<cffunction name="setdateUpdated" access="public" returntype="void" default="void" hint="Mutator for property dateUpdated" output="false">
+<cfargument name="dateUpdated" type="date" required="true" hint="The value to set dateUpdated to">
+<cfscript>
+if(NOT StructKeyExists(instance, "dateUpdated") OR getdateUpdated() neq arguments.dateUpdated)
+{
+instance.dateUpdated = (arguments.dateUpdated);
+setIsDirty(true);
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="getlogDate" access="public" returntype="date" default="date" hint="Accessor for property logDate" output="false">
+<cfscript>
+return instance.logDate;
+</cfscript>
+</cffunction>
+
+<cffunction name="setlogDate" access="public" returntype="void" default="void" hint="Mutator for property logDate" output="false">
+<cfargument name="logDate" type="date" required="true" hint="The value to set logDate to">
+<cfscript>
+if(NOT StructKeyExists(instance, "logDate") OR getlogDate() neq arguments.logDate)
+{
+instance.logDate = (arguments.logDate);
+setIsDirty(true);
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="gethours" access="public" returntype="numeric" default="numeric" hint="Accessor for property hours" output="false">
+<cfscript>
+return instance.hours;
+</cfscript>
+</cffunction>
+
+<cffunction name="sethours" access="public" returntype="void" default="void" hint="Mutator for property hours" output="false">
+<cfargument name="hours" type="numeric" required="true" hint="The value to set hours to">
+<cfscript>
+if(NOT StructKeyExists(instance, "hours") OR gethours() neq arguments.hours)
+{
+instance.hours = getUtility().trimZero(arguments.hours);
+setIsDirty(true);
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="getUserisLoaded" access="public" returntype="boolean" default="boolean" hint="Whether or not the composition 'User' has been loaded yet" output="false">
+<cfscript>
+if(NOT StructKeyExists(getLoaded(), "User"))
+{
+setUserisLoaded(false);
+}
+return StructFind(getLoaded(), "User");
+</cfscript>
+</cffunction>
+
+<cffunction name="setUserisLoaded" access="private" returntype="void" default="void" hint="Set the loaded state of composition 'arguments.name'" output="false">
+<cfargument name="loaded" type="boolean" required="true" hint="Whether or not this composition has been loaded">
+<cfscript>
+StructInsert(getLoaded(), "User", arguments.loaded, true);
+</cfscript>
+</cffunction>
+
+<cffunction name="loadUser" access="package" returntype="void" default="void" hint="Lazy load composition 'User'" output="false">
+<cfif NOT getUserisLoaded()>
+<cflock name="transfer.load.log.Entry.#getSystem().identityHashCode(this)#" timeout="60">
+<cfif NOT getUserisLoaded()>
+<cfscript>
+getTransfer().loadManyToOne(getThisObject(), "User");
+</cfscript>
+</cfif>
+</cflock>
+</cfif>
+</cffunction>
+
+<cffunction name="getClientisLoaded" access="public" returntype="boolean" default="boolean" hint="Whether or not the composition 'Client' has been loaded yet" output="false">
+<cfscript>
+if(NOT StructKeyExists(getLoaded(), "Client"))
+{
+setClientisLoaded(false);
+}
+return StructFind(getLoaded(), "Client");
+</cfscript>
+</cffunction>
+
+<cffunction name="setClientisLoaded" access="private" returntype="void" default="void" hint="Set the loaded state of composition 'arguments.name'" output="false">
+<cfargument name="loaded" type="boolean" required="true" hint="Whether or not this composition has been loaded">
+<cfscript>
+StructInsert(getLoaded(), "Client", arguments.loaded, true);
+</cfscript>
+</cffunction>
+
+<cffunction name="loadClient" access="package" returntype="void" default="void" hint="Lazy load composition 'Client'" output="false">
+<cfif NOT getClientisLoaded()>
+<cflock name="transfer.load.log.Entry.#getSystem().identityHashCode(this)#" timeout="60">
+<cfif NOT getClientisLoaded()>
+<cfscript>
+getTransfer().loadManyToOne(getThisObject(), "Client");
+</cfscript>
+</cfif>
+</cflock>
+</cfif>
+</cffunction>
+
+<cffunction name="getProjectisLoaded" access="public" returntype="boolean" default="boolean" hint="Whether or not the composition 'Project' has been loaded yet" output="false">
+<cfscript>
+if(NOT StructKeyExists(getLoaded(), "Project"))
+{
+setProjectisLoaded(false);
+}
+return StructFind(getLoaded(), "Project");
+</cfscript>
+</cffunction>
+
+<cffunction name="setProjectisLoaded" access="private" returntype="void" default="void" hint="Set the loaded state of composition 'arguments.name'" output="false">
+<cfargument name="loaded" type="boolean" required="true" hint="Whether or not this composition has been loaded">
+<cfscript>
+StructInsert(getLoaded(), "Project", arguments.loaded, true);
+</cfscript>
+</cffunction>
+
+<cffunction name="loadProject" access="package" returntype="void" default="void" hint="Lazy load composition 'Project'" output="false">
+<cfif NOT getProjectisLoaded()>
+<cflock name="transfer.load.log.Entry.#getSystem().identityHashCode(this)#" timeout="60">
+<cfif NOT getProjectisLoaded()>
+<cfscript>
+getTransfer().loadManyToOne(getThisObject(), "Project");
+</cfscript>
+</cfif>
+</cflock>
+</cfif>
+</cffunction>
+
+<cffunction name="setMemento" access="public" returntype="void" default="void" hint="set the state of this object from a memento" output="false">
+<cfargument name="memento" type="struct" required="true" hint="the memento to set the state with">
+<cfscript>
+var composite = 0;
+if(NOT getIsPersisted())
+{
+setlog_id(arguments.memento.log_id);
+}
+setPropertyMemento(arguments.memento);
+setUserisLoaded(false);
+if(StructKeyExists(arguments.memento, "User"))
+{
+composite = arguments.memento.User;
+}
+else
+{
+composite = StructNew();
+}
+setUserMemento(composite);
+setClientisLoaded(false);
+if(StructKeyExists(arguments.memento, "Client"))
+{
+composite = arguments.memento.Client;
+}
+else
+{
+composite = StructNew();
+}
+setClientMemento(composite);
+setProjectisLoaded(false);
+if(StructKeyExists(arguments.memento, "Project"))
+{
+composite = arguments.memento.Project;
+}
+else
+{
+composite = StructNew();
+}
+setProjectMemento(composite);
+</cfscript>
+</cffunction>
+
+<cffunction name="setPropertyMemento" access="public" returntype="void" default="void" hint="set the Property state of this object with a memento" output="false">
+<cfargument name="memento" type="struct" required="true" hint="the memento to set the state with">
+<cfscript>
+setdescription(arguments.memento.description);
+setdateAdded(arguments.memento.dateAdded);
+setdateUpdated(arguments.memento.dateUpdated);
+setlogDate(arguments.memento.logDate);
+sethours(arguments.memento.hours);
+</cfscript>
+</cffunction>
+
+<cffunction name="setUserMemento" access="public" returntype="void" default="void" hint="set the state of composition manytoone 'User'" output="false">
+<cfargument name="memento" type="struct" required="true" hint="the memento to set the state with">
+<cfscript>
+var composite = 0;
+if(StructIsEmpty(arguments.memento))
+{
+removeUser();
+}
+else
+{
+composite = getComposite("user.User", arguments.memento, "id");
+setUser(composite);
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="setClientMemento" access="public" returntype="void" default="void" hint="set the state of composition manytoone 'Client'" output="false">
+<cfargument name="memento" type="struct" required="true" hint="the memento to set the state with">
+<cfscript>
+var composite = 0;
+if(StructIsEmpty(arguments.memento))
+{
+removeClient();
+}
+else
+{
+composite = getComposite("client.Client", arguments.memento, "id");
+setClient(composite);
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="setProjectMemento" access="public" returntype="void" default="void" hint="set the state of composition manytoone 'Project'" output="false">
+<cfargument name="memento" type="struct" required="true" hint="the memento to set the state with">
+<cfscript>
+var composite = 0;
+if(StructIsEmpty(arguments.memento))
+{
+removeProject();
+}
+else
+{
+composite = getComposite("project.Project", arguments.memento, "id");
+setProject(composite);
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="getMemento" access="public" returntype="struct" default="struct" hint="Returns the memento for all non-lazy members of this object" output="false">
+<cfscript>
+var memento = StructNew();
+memento.log_id = getlog_id();
+memento.transfer_isDirty = getIsDirty();
+memento.transfer_isPersisted = getIsPersisted();
+StructAppend(memento, getPropertyMemento());
+memento.User = getUserMemento();
+memento.Client = getClientMemento();
+memento.Project = getProjectMemento();
+return memento;
+</cfscript>
+</cffunction>
+
+<cffunction name="getPropertyMemento" access="public" returntype="struct" default="struct" hint="returns the memento for properties" output="false">
+<cfscript>
+var memento = StructNew();
+memento.description = getdescription();
+memento.dateAdded = getdateAdded();
+memento.dateUpdated = getdateUpdated();
+memento.logDate = getlogDate();
+memento.hours = gethours();
+return memento;
+</cfscript>
+</cffunction>
+
+<cffunction name="getUserMemento" access="public" returntype="struct" default="struct" hint="returns the memento for manytoone User" output="false">
+<cfscript>
+var memento = StructNew();
+if(hasUser())
+{
+memento = getUser().getMemento();
+}
+return memento;
+</cfscript>
+</cffunction>
+
+<cffunction name="getClientMemento" access="public" returntype="struct" default="struct" hint="returns the memento for manytoone Client" output="false">
+<cfscript>
+var memento = StructNew();
+if(hasClient())
+{
+memento = getClient().getMemento();
+}
+return memento;
+</cfscript>
+</cffunction>
+
+<cffunction name="getProjectMemento" access="public" returntype="struct" default="struct" hint="returns the memento for manytoone Project" output="false">
+<cfscript>
+var memento = StructNew();
+if(hasProject())
+{
+memento = getProject().getMemento();
+}
+return memento;
+</cfscript>
+</cffunction>
+
+<cffunction name="copyValuesTo" access="public" returntype="void" default="void" hint="Copies the values of this object to one of the same class" output="false">
+<cfargument name="transfer" type="transfer.com.TransferObject" required="true" hint="The object to copy values to">
+<cfscript>
+if(arguments.transfer.getClassName() neq "log.Entry")
+{
+throw("InvalidTransferClassException","The supplied Transfer class was not the one specified in the configuration file ","The Transfer class of '#arguments.transfer.getClassName()#' does not match the expected class of 'log.Entry'");
+}
+arguments.transfer.setMemento(getMemento());
+</cfscript>
+</cffunction>
+
+<cffunction name="getUser" access="public" returntype="transfer.com.TransferObject" default="transfer.com.TransferObject" hint="Accessor for User, user.User" output="false">
+<cfscript>
+if(NOT getUserisLoaded())
+{
+loadUser();
+}
+if(NOT structKeyExists(instance, "User"))
+{
+throw("ManyToOneNotSetException","A ManyToOne TransferObject has not been initialised.","In TransferObject 'log.Entry' manytoone 'user.User' does not exist, when calling getUser()");
+}
+return instance.User;
+</cfscript>
+</cffunction>
+
+<cffunction name="setUser" access="public" returntype="void" default="void" hint="Mutator for User, user.User" output="false">
+<cfargument name="transfer" type="transfer.com.TransferObject" required="true" hint="The user.User to set">
+<cfscript>
+if(arguments.transfer.getClassName() neq "user.User")
+{
+throw("InvalidTransferClassException","The supplied Transfer class was not the one specified in the configuration file ","The Transfer class of '#arguments.transfer.getClassName()#' does not match the expected class of 'user.User'");
+}
+if((NOT getUserisLoaded()) OR (NOT (StructKeyExists(instance, "User") AND getUser().equalsTransfer(arguments.transfer))))
+{
+instance.User = arguments.transfer;
+setIsDirty(true);
+setUserisLoaded(true);
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="hasUser" access="public" returntype="boolean" default="boolean" hint="Whether or not this object contains a user.User" output="false">
+<cfscript>
+if(NOT getUserisLoaded())
+{
+loadUser();
+}
+return StructKeyExists(instance,"User");
+</cfscript>
+</cffunction>
+
+<cffunction name="removeUser" access="public" returntype="void" default="void" hint="remove the instance of user.User" output="false">
+<cfscript>
+if(NOT getUserisLoaded() OR hasUser())
+{
+StructDelete(instance,"User");
+setIsDirty(true);
+setUserisLoaded(true);
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="getClient" access="public" returntype="transfer.com.TransferObject" default="transfer.com.TransferObject" hint="Accessor for Client, client.Client" output="false">
+<cfscript>
+if(NOT getClientisLoaded())
+{
+loadClient();
+}
+if(NOT structKeyExists(instance, "Client"))
+{
+throw("ManyToOneNotSetException","A ManyToOne TransferObject has not been initialised.","In TransferObject 'log.Entry' manytoone 'client.Client' does not exist, when calling getClient()");
+}
+return instance.Client;
+</cfscript>
+</cffunction>
+
+<cffunction name="setClient" access="public" returntype="void" default="void" hint="Mutator for Client, client.Client" output="false">
+<cfargument name="transfer" type="transfer.com.TransferObject" required="true" hint="The client.Client to set">
+<cfscript>
+if(arguments.transfer.getClassName() neq "client.Client")
+{
+throw("InvalidTransferClassException","The supplied Transfer class was not the one specified in the configuration file ","The Transfer class of '#arguments.transfer.getClassName()#' does not match the expected class of 'client.Client'");
+}
+if((NOT getClientisLoaded()) OR (NOT (StructKeyExists(instance, "Client") AND getClient().equalsTransfer(arguments.transfer))))
+{
+instance.Client = arguments.transfer;
+setIsDirty(true);
+setClientisLoaded(true);
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="hasClient" access="public" returntype="boolean" default="boolean" hint="Whether or not this object contains a client.Client" output="false">
+<cfscript>
+if(NOT getClientisLoaded())
+{
+loadClient();
+}
+return StructKeyExists(instance,"Client");
+</cfscript>
+</cffunction>
+
+<cffunction name="removeClient" access="public" returntype="void" default="void" hint="remove the instance of client.Client" output="false">
+<cfscript>
+if(NOT getClientisLoaded() OR hasClient())
+{
+StructDelete(instance,"Client");
+setIsDirty(true);
+setClientisLoaded(true);
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="getProject" access="public" returntype="transfer.com.TransferObject" default="transfer.com.TransferObject" hint="Accessor for Project, project.Project" output="false">
+<cfscript>
+if(NOT getProjectisLoaded())
+{
+loadProject();
+}
+if(NOT structKeyExists(instance, "Project"))
+{
+throw("ManyToOneNotSetException","A ManyToOne TransferObject has not been initialised.","In TransferObject 'log.Entry' manytoone 'project.Project' does not exist, when calling getProject()");
+}
+return instance.Project;
+</cfscript>
+</cffunction>
+
+<cffunction name="setProject" access="public" returntype="void" default="void" hint="Mutator for Project, project.Project" output="false">
+<cfargument name="transfer" type="transfer.com.TransferObject" required="true" hint="The project.Project to set">
+<cfscript>
+if(arguments.transfer.getClassName() neq "project.Project")
+{
+throw("InvalidTransferClassException","The supplied Transfer class was not the one specified in the configuration file ","The Transfer class of '#arguments.transfer.getClassName()#' does not match the expected class of 'project.Project'");
+}
+if((NOT getProjectisLoaded()) OR (NOT (StructKeyExists(instance, "Project") AND getProject().equalsTransfer(arguments.transfer))))
+{
+instance.Project = arguments.transfer;
+setIsDirty(true);
+setProjectisLoaded(true);
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="hasProject" access="public" returntype="boolean" default="boolean" hint="Whether or not this object contains a project.Project" output="false">
+<cfscript>
+if(NOT getProjectisLoaded())
+{
+loadProject();
+}
+return StructKeyExists(instance,"Project");
+</cfscript>
+</cffunction>
+
+<cffunction name="removeProject" access="public" returntype="void" default="void" hint="remove the instance of project.Project" output="false">
+<cfscript>
+if(NOT getProjectisLoaded() OR hasProject())
+{
+StructDelete(instance,"Project");
+setIsDirty(true);
+setProjectisLoaded(true);
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="validateCacheState" access="package" returntype="boolean" default="boolean" hint="if this object is cached, then validate that all it's composites are cached too" output="false">
+<cfscript>
+var iterator = 0;
+var item = 0;
+if(getIsPersisted() AND NOT getTransfer().validateIsCached(getThisObject()))
+{
+return true;
+}
+if(getUserisLoaded() AND hasUser())
+{
+item = getUser();
+if(item.getIsClone() OR NOT getTransfer().validateIsCached(item))
+{
+return false;
+}
+}
+if(getClientisLoaded() AND hasClient())
+{
+item = getClient();
+if(item.getIsClone() OR NOT getTransfer().validateIsCached(item))
+{
+return false;
+}
+}
+if(getProjectisLoaded() AND hasProject())
+{
+item = getProject();
+if(item.getIsClone() OR NOT getTransfer().validateIsCached(item))
+{
+return false;
+}
+}
+return true;
+</cfscript>
+</cffunction>
+
+<cffunction name="actionAfterCreateTransferEvent" access="public" returntype="void" default="void" hint="Observer action method for when creates occur" output="false">
+<cfargument name="event" type="transfer.com.events.TransferEvent" required="true" hint="The Transfer Event Object">
+<cfscript>
+var className = arguments.event.getTransferObject().getClassName();
+</cfscript>
+</cffunction>
+
+<cffunction name="actionAfterDeleteTransferEvent" access="public" returntype="void" default="void" hint="Observer action method for when deletes occur" output="false">
+<cfargument name="event" type="transfer.com.events.TransferEvent" required="true" hint="The Transfer Event Object">
+<cfscript>
+var className = arguments.event.getTransferObject().getClassName();
+if(className eq "user.User")
+{
+if(getUserIsLoaded() AND hasUser() AND getUser().equalsTransfer(arguments.event.getTransferObject()))
+{
+removeUser(arguments.event.getTransferObject());
+}
+}
+else if(className eq "client.Client")
+{
+if(getClientIsLoaded() AND hasClient() AND getClient().equalsTransfer(arguments.event.getTransferObject()))
+{
+removeClient(arguments.event.getTransferObject());
+}
+}
+else if(className eq "project.Project")
+{
+if(getProjectIsLoaded() AND hasProject() AND getProject().equalsTransfer(arguments.event.getTransferObject()))
+{
+removeProject(arguments.event.getTransferObject());
+}
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="actionAfterUpdateTransferEvent" access="public" returntype="void" default="void" hint="Observer method action for when updates occur" output="false">
+<cfargument name="event" type="transfer.com.events.TransferEvent" required="true" hint="The Transfer Event Object">
+<cfscript>
+var className = arguments.event.getTransferObject().getClassName();
+</cfscript>
+</cffunction>
+
+<cffunction name="actionAfterDiscardTransferEvent" access="public" returntype="void" default="void" hint="Observer action method for when discards occur" output="false">
+<cfargument name="event" type="transfer.com.events.TransferEvent" required="true" hint="The Transfer Event Object">
+<cfscript>
+var discard = false;
+var className = arguments.event.getTransferObject().getClassName();
+if(className eq "user.User")
+{
+if(getUserIsLoaded() AND hasUser() AND getUser().equalsTransfer(arguments.event.getTransferObject()))
+{
+discard = true;
+}
+}
+else if(className eq "client.Client")
+{
+if(getClientIsLoaded() AND hasClient() AND getClient().equalsTransfer(arguments.event.getTransferObject()))
+{
+discard = true;
+}
+}
+else if(className eq "project.Project")
+{
+if(getProjectIsLoaded() AND hasProject() AND getProject().equalsTransfer(arguments.event.getTransferObject()))
+{
+discard = true;
+}
+}
+if(discard)
+{
+getTransfer().discard(getThisObject());
+}
+</cfscript>
+</cffunction>
+
+

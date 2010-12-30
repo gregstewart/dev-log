@@ -1,0 +1,1 @@
+<cflocation url="#variables.mySelf#login.isLoggedIn" addtoken="true"/>

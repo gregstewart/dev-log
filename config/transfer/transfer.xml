@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<transfer xsi:noNamespaceSchemaLocation="http://www.compoundtheory.com/transfer/resources/xsd/transfer.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<!-- 
+	This section defines how Objects
+	are cached in this system.
+
+	It does not need to be set, as there are
+	default settings for caching.
+	 -->
+
+	<objectCache>
+
+		<!-- 
+		'defaultcache' is the setting for
+		all classes not specified by a 'cache' element.
+
+		Here we have set the scope of all the
+		objects to be cached in the 'instance', scope as
+		an example.
+
+		Instance scope is the default scope for caching,
+		as changing the scope is generally not required.
+		It simply means that caching happens within the Transfer
+		library itself, rather than a shared scope like 
+		application or session.
+		 -->
+
+		<defaultcache>
+
+			<scope type="instance"/>
+
+		</defaultcache>
+
+		<!-- 
+
+		Tells the system to only 
+
+		have a maximum 100 Post objects
+
+		in cache at any one time
+
+		
+
+		<cache class="post.Post">
+
+			<maxobjects value="100"/>
+
+		</cache> -->
+
+	</objectCache>
+
+	<objectDefinitions>
+
+	  	<package name="user">
+
+		  	<!-- User details -->
+
+	  		<object name="User" table="user">
+
+	  			<id name="id" type="numeric"/>
+	  			<property name="firstName" type="string" column="firstName"/>
+	  			<property name="lastName" type="string" column="lastName"/>
+				<property name="userName" type="string" column="userName"/>
+				<property name="password" type="string" column="password"/>
+				<property name="email" type="string" column="email"/>
+				<property name="dateAdded" type="date" column="dateAdded"/>
+
+				<!-- 
+	  			Link between a user and it's array of Clients
+	  			 -->
+				<onetomany name="ClientUserRel">
+
+					<!-- 
+					The column on the Client2User table that
+					links back to the User table.
+					 -->
+					<link to="user.ClientUserRel" column="user_id"/>
+
+					<!-- 
+					Specifying the collection is an array and is
+					ordered by the dateTime property of the Comment
+					-->
+
+					<collection type="array">
+						<order property="user_id" order="asc"/>
+					</collection>
+
+				</onetomany>
+				<!-- 
+	  			Link between a user and it's array of Projects
+	  			 -->
+				<onetomany name="ProjectUserRel">
+
+					<!-- 
+					The column on the User2Project table that
+					links back to the User table.
+					 -->
+					<link to="user.ProjectUserRel" column="user_id"/>
+
+					<!-- 
+					Specifying the collection is an array and is
+					ordered by the project_id
+					-->
+
+					<collection type="array">
+						<order property="project_id" order="asc"/>
+					</collection>
+
+				</onetomany>
+				
+				<!-- 
+	  			Link between a user and it's array of Projects
+	  			 -->
+				<onetomany name="LogUserRel" lazy="true">
+
+					<!-- 
+					The column on the logEntry table that
+					links back to the User table.
+					 -->
+					<link to="user.LogUserRel" column="user_id"/>
+
+					<!-- 
+					Specifying the collection is an array and is
+					ordered by logDate
+					-->
+					<collection type="array">
+						<order property="logDate" order="desc"/>
+					</collection>
+
+				</onetomany>						
+	  		</object>
+			<!-- A client 2 a user -->
+	  		<object name="ClientUserRel" table="client2user">
+
+	  			<id name="client_id" type="numeric"/>
+	  			<property name="user_id" type="numeric" column="user_id"/>
+				
+				  
+				<manytoone name="ClientDetails">
+					<!-- 
+					The column on the Client2User table that
+					links back to the Client table.
+					 -->
+					<link to="client.Client" column="client_id"/>
+
+				</manytoone>
+	  		</object>
+			  
+			<!-- A project 2 a user -->
+	  		<object name="ProjectUserRel" table="user2project">
+
+	  			<id name="project_id" type="numeric"/>
+	  			<property name="user_id" type="numeric" column="user_id"/>
+				
+				  
+				<manytoone name="ProjectDetails">
+					<!-- 
+					The column on the User2Project table that
+					links back to the Project table.
+					 -->
+					<link to="project.Project" column="project_id"/>
+
+				</manytoone>
+	  		</object>
+			  
+			<!-- A log 2 a user -->
+	  		<object name="LogUserRel" table="logEntry">
+
+	  			<id name="log_id" type="numeric"/>
+	  			<property name="user_id" type="numeric" column="user_id"/>
+	  			<!-- <property name="project_id" type="numeric" column="project_id"/> -->
+	  			<!-- <property name="client_id" type="numeric" column="client_id"/>-->
+	  			<property type="string" name="description" column="description"/>
+				<property type="date" name="dateAdded" column="dateAdded"/>
+				<property type="date" name="dateUpdated" column="dateUpdated"/>
+				<property type="date" name="logDate" column="date"/>
+				<property type="numeric" name="hours" column="hours"/>
+				
+				<manytoone name="ProjectDetails">
+					<!-- 
+					The column on the log table that
+					links back to the Project table.
+					 -->
+					<link to="project.Project" column="project_id"/>
+
+				</manytoone>
+				
+				<manytoone name="ClientDetails">
+					<!-- 
+					The column on the log table that
+					links back to the Client table.
+					 -->
+					<link to="client.Client" column="client_id"/>
+
+				</manytoone>
+	  		</object>
+				
+	  	</package>
+		
+		<package name="client">
+			
+			<!-- Client details -->
+	  		<object name="Client" table="client">
+
+	  			<id name="id" type="numeric"/>
+	  			<property name="Name" type="string" column="name"/>
+				
+				<manytomany table="client2user" name="ClientUserRel" lazy="true">
+					<link to="client.Client" column="client_id"/>
+					<link to="user.User" column="user_id"/>
+					
+					<collection type="array"/>
+				</manytomany>
+	  		</object>
+			
+			<!-- A client 2 a project -->
+	  		<object name="ClientProjectRel" table="client2project">
+
+	  			<id name="client_id" type="numeric"/>
+	  			<property name="project_id" type="numeric" column="project_id"/>
+				  
+				<manytoone name="ProjectDetails">
+					<!-- 
+					The column on the Client2Project table that
+					links back to the Project table.
+					 -->
+					<link to="project.Project" column="project_id"/>
+
+				</manytoone>
+	  		</object>
+			
+		</package>
+		
+		<package name="project">
+			<object name="Project" table="project">
+				<id name="id" type="numeric"/>
+				<property type="string" name="name" column="title"/>
+				<property type="string" name="description" column="description"/>
+				<property type="string" name="dateAdded" column="dateAdded"/>
+				<property type="string" name="dateUpdated" column="dateUpdated"/>
+			
+				<manytomany table="user2project" name="UserProjectRel" lazy="true">
+					<link to="project.Project" column="project_id"/>
+					<link to="user.User" column="user_id"/>
+					
+					<collection type="array"/>
+				</manytomany>
+				
+				<manytomany table="client2project" name="ClientProjectRel" lazy="true">
+					
+					<link to="project.Project" column="project_id"/>
+					<link to="client.Client" column="client_id"/>
+					
+					<collection type="array"/>
+				</manytomany>				
+			</object>
+
+		</package>
+		
+		<package name="log">
+			<object name="Entry" table="logEntry">
+				<id name="log_id" type="numeric"/>
+				<property type="string" name="description" column="description"/>
+				<property type="date" name="dateAdded" column="dateAdded"/>
+				<property type="date" name="dateUpdated" column="dateUpdated"/>
+				<property type="date" name="logDate" column="date"/>
+				<property type="numeric" name="hours" column="hours"/>
+				
+				<!-- Link between a log entry and the User who wrote it -->
+	  			<manytoone name="User">
+	  				<!-- 
+	  				The column on the logEntry table that links
+	  				to the primary key on the User
+	  				 -->
+	  				<link to="user.User" column="user_id"/>
+	  			</manytoone>
+				<!-- Link between a log entry and the User who wrote it -->
+	  			<manytoone name="Client">
+	  				<!-- 
+	  				The column on the logEntry table that links
+	  				to the primary key on the User
+	  				 -->
+	  				<link to="client.Client" column="client_id"/>
+	  			</manytoone>
+				<!-- Link between a log entry and the User who wrote it -->
+	  			<manytoone name="Project">
+	  				<!-- 
+	  				The column on the logEntry table that links
+	  				to the primary key on the User
+	  				 -->
+	  				<link to="project.Project" column="project_id"/>
+	  			</manytoone>
+			</object>
+			
+		</package>
+	</objectDefinitions>
+
+</transfer>
+

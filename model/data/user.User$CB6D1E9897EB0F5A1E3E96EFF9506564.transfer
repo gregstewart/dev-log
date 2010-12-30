@@ -1,0 +1,1369 @@
+<cffunction name="init" access="public" returntype="transfer.com.TransferObject" default="transfer.com.TransferObject" hint="Constructor for Transfer class user.User" output="false">
+<cfargument name="transfer" type="transfer.com.Transfer" required="true" hint="The Transfer library">
+<cfargument name="utility" type="transfer.com.util.Utility" required="true" hint="The Utility object">
+<cfargument name="nullable" type="transfer.com.sql.Nullable" required="true" hint="The Nullable lookup object">
+<cfargument name="thisObject" type="transfer.com.TransferObject" required="true" hint="What is determined to be the base 'this' object for this TransferObject">
+<cfscript>
+instance = StructNew();
+setThisObject(arguments.thisObject);
+setTransfer(arguments.transfer);
+setUtility(arguments.utility);
+setSystem(createObject("java", "java.lang.System"));
+setNullable(arguments.nullable);
+setClassName("user.User");
+setIsDirty(true);
+setIsPersisted(false);
+setIsClone(false);
+setid(getNullable().getNullNumeric(getClassName(), "id"));
+setfirstName("");
+setlastName("");
+setuserName("");
+setpassword("");
+setemail("");
+setdateAdded(Now());
+setLoaded(StructNew());
+setClientUserRelisLoaded(true);
+setProjectUserRelisLoaded(true);
+setLogUserRelisLoaded(true);
+setClientUserRelCollection(ArrayNew(1));
+setClientUserRelIDCollection(StructNew());
+setProjectUserRelCollection(ArrayNew(1));
+setProjectUserRelIDCollection(StructNew());
+setLogUserRelCollection(ArrayNew(1));
+setLogUserRelIDCollection(StructNew());
+if(StructKeyExists(this, "configure") OR StructKeyExists(variables, "configure"))
+{
+configure();
+}
+return this;
+</cfscript>
+</cffunction>
+
+<cffunction name="equalsTransfer" access="public" returntype="boolean" default="boolean" hint="If an object is persisted, returns true if they are of the same class and same id. If not, returns true if they are the same object." output="false">
+<cfargument name="transfer" type="transfer.com.TransferObject" required="true" hint="The TransferObject to test against">
+<cfscript>
+if(getIsPersisted())
+{
+if(getClassName() neq arguments.transfer.getClassName())
+{
+return false;
+}
+return (getid() eq arguments.transfer.getid());
+}
+else
+{
+return sameTransfer(arguments.transfer);
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="getid" access="public" returntype="numeric" default="numeric" hint="Accessor for property id" output="false">
+<cfscript>
+return instance.id;
+</cfscript>
+</cffunction>
+
+<cffunction name="setid" access="public" returntype="void" default="void" hint="Mutator for property id" output="false">
+<cfargument name="id" type="numeric" required="true" hint="The value to set id to">
+<cfscript>
+if(NOT StructKeyExists(instance, "id") OR getid() neq arguments.id)
+{
+instance.id = getUtility().trimZero(arguments.id);
+setIsDirty(true);
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="getfirstName" access="public" returntype="string" default="string" hint="Accessor for property firstName" output="false">
+<cfscript>
+return instance.firstName;
+</cfscript>
+</cffunction>
+
+<cffunction name="setfirstName" access="public" returntype="void" default="void" hint="Mutator for property firstName" output="false">
+<cfargument name="firstName" type="string" required="true" hint="The value to set firstName to">
+<cfscript>
+if(NOT StructKeyExists(instance, "firstName") OR Compare(getfirstName(), arguments.firstName) neq 0)
+{
+instance.firstName = (arguments.firstName);
+setIsDirty(true);
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="getlastName" access="public" returntype="string" default="string" hint="Accessor for property lastName" output="false">
+<cfscript>
+return instance.lastName;
+</cfscript>
+</cffunction>
+
+<cffunction name="setlastName" access="public" returntype="void" default="void" hint="Mutator for property lastName" output="false">
+<cfargument name="lastName" type="string" required="true" hint="The value to set lastName to">
+<cfscript>
+if(NOT StructKeyExists(instance, "lastName") OR Compare(getlastName(), arguments.lastName) neq 0)
+{
+instance.lastName = (arguments.lastName);
+setIsDirty(true);
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="getuserName" access="public" returntype="string" default="string" hint="Accessor for property userName" output="false">
+<cfscript>
+return instance.userName;
+</cfscript>
+</cffunction>
+
+<cffunction name="setuserName" access="public" returntype="void" default="void" hint="Mutator for property userName" output="false">
+<cfargument name="userName" type="string" required="true" hint="The value to set userName to">
+<cfscript>
+if(NOT StructKeyExists(instance, "userName") OR Compare(getuserName(), arguments.userName) neq 0)
+{
+instance.userName = (arguments.userName);
+setIsDirty(true);
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="getpassword" access="public" returntype="string" default="string" hint="Accessor for property password" output="false">
+<cfscript>
+return instance.password;
+</cfscript>
+</cffunction>
+
+<cffunction name="setpassword" access="public" returntype="void" default="void" hint="Mutator for property password" output="false">
+<cfargument name="password" type="string" required="true" hint="The value to set password to">
+<cfscript>
+if(NOT StructKeyExists(instance, "password") OR Compare(getpassword(), arguments.password) neq 0)
+{
+instance.password = (arguments.password);
+setIsDirty(true);
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="getemail" access="public" returntype="string" default="string" hint="Accessor for property email" output="false">
+<cfscript>
+return instance.email;
+</cfscript>
+</cffunction>
+
+<cffunction name="setemail" access="public" returntype="void" default="void" hint="Mutator for property email" output="false">
+<cfargument name="email" type="string" required="true" hint="The value to set email to">
+<cfscript>
+if(NOT StructKeyExists(instance, "email") OR Compare(getemail(), arguments.email) neq 0)
+{
+instance.email = (arguments.email);
+setIsDirty(true);
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="getdateAdded" access="public" returntype="date" default="date" hint="Accessor for property dateAdded" output="false">
+<cfscript>
+return instance.dateAdded;
+</cfscript>
+</cffunction>
+
+<cffunction name="setdateAdded" access="public" returntype="void" default="void" hint="Mutator for property dateAdded" output="false">
+<cfargument name="dateAdded" type="date" required="true" hint="The value to set dateAdded to">
+<cfscript>
+if(NOT StructKeyExists(instance, "dateAdded") OR getdateAdded() neq arguments.dateAdded)
+{
+instance.dateAdded = (arguments.dateAdded);
+setIsDirty(true);
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="getClientUserRelisLoaded" access="public" returntype="boolean" default="boolean" hint="Whether or not the composition 'ClientUserRel' has been loaded yet" output="false">
+<cfscript>
+if(NOT StructKeyExists(getLoaded(), "ClientUserRel"))
+{
+setClientUserRelisLoaded(false);
+}
+return StructFind(getLoaded(), "ClientUserRel");
+</cfscript>
+</cffunction>
+
+<cffunction name="setClientUserRelisLoaded" access="private" returntype="void" default="void" hint="Set the loaded state of composition 'arguments.name'" output="false">
+<cfargument name="loaded" type="boolean" required="true" hint="Whether or not this composition has been loaded">
+<cfscript>
+StructInsert(getLoaded(), "ClientUserRel", arguments.loaded, true);
+</cfscript>
+</cffunction>
+
+<cffunction name="loadClientUserRel" access="package" returntype="void" default="void" hint="Lazy load composition 'ClientUserRel'" output="false">
+<cfif NOT getClientUserRelisLoaded()>
+<cflock name="transfer.load.user.User.#getSystem().identityHashCode(this)#" timeout="60">
+<cfif NOT getClientUserRelisLoaded()>
+<cfscript>
+getTransfer().loadOneToMany(getThisObject(), "ClientUserRel");
+</cfscript>
+</cfif>
+</cflock>
+</cfif>
+</cffunction>
+
+<cffunction name="getProjectUserRelisLoaded" access="public" returntype="boolean" default="boolean" hint="Whether or not the composition 'ProjectUserRel' has been loaded yet" output="false">
+<cfscript>
+if(NOT StructKeyExists(getLoaded(), "ProjectUserRel"))
+{
+setProjectUserRelisLoaded(false);
+}
+return StructFind(getLoaded(), "ProjectUserRel");
+</cfscript>
+</cffunction>
+
+<cffunction name="setProjectUserRelisLoaded" access="private" returntype="void" default="void" hint="Set the loaded state of composition 'arguments.name'" output="false">
+<cfargument name="loaded" type="boolean" required="true" hint="Whether or not this composition has been loaded">
+<cfscript>
+StructInsert(getLoaded(), "ProjectUserRel", arguments.loaded, true);
+</cfscript>
+</cffunction>
+
+<cffunction name="loadProjectUserRel" access="package" returntype="void" default="void" hint="Lazy load composition 'ProjectUserRel'" output="false">
+<cfif NOT getProjectUserRelisLoaded()>
+<cflock name="transfer.load.user.User.#getSystem().identityHashCode(this)#" timeout="60">
+<cfif NOT getProjectUserRelisLoaded()>
+<cfscript>
+getTransfer().loadOneToMany(getThisObject(), "ProjectUserRel");
+</cfscript>
+</cfif>
+</cflock>
+</cfif>
+</cffunction>
+
+<cffunction name="getLogUserRelisLoaded" access="public" returntype="boolean" default="boolean" hint="Whether or not the composition 'LogUserRel' has been loaded yet" output="false">
+<cfscript>
+if(NOT StructKeyExists(getLoaded(), "LogUserRel"))
+{
+setLogUserRelisLoaded(false);
+}
+return StructFind(getLoaded(), "LogUserRel");
+</cfscript>
+</cffunction>
+
+<cffunction name="setLogUserRelisLoaded" access="private" returntype="void" default="void" hint="Set the loaded state of composition 'arguments.name'" output="false">
+<cfargument name="loaded" type="boolean" required="true" hint="Whether or not this composition has been loaded">
+<cfscript>
+StructInsert(getLoaded(), "LogUserRel", arguments.loaded, true);
+</cfscript>
+</cffunction>
+
+<cffunction name="loadLogUserRel" access="package" returntype="void" default="void" hint="Lazy load composition 'LogUserRel'" output="false">
+<cfif NOT getLogUserRelisLoaded()>
+<cflock name="transfer.load.user.User.#getSystem().identityHashCode(this)#" timeout="60">
+<cfif NOT getLogUserRelisLoaded()>
+<cfscript>
+getTransfer().loadOneToMany(getThisObject(), "LogUserRel");
+</cfscript>
+</cfif>
+</cflock>
+</cfif>
+</cffunction>
+
+<cffunction name="setMemento" access="public" returntype="void" default="void" hint="set the state of this object from a memento" output="false">
+<cfargument name="memento" type="struct" required="true" hint="the memento to set the state with">
+<cfscript>
+var composite = 0;
+if(NOT getIsPersisted())
+{
+setid(arguments.memento.id);
+}
+setPropertyMemento(arguments.memento);
+setClientUserRelisLoaded(false);
+if(structKeyExists(arguments.memento, "ClientUserRel"))
+{
+composite = arguments.memento.ClientUserRel;
+}
+else
+{
+composite = ArrayNew(1);
+}
+setClientUserRelMemento(composite);
+setProjectUserRelisLoaded(false);
+if(structKeyExists(arguments.memento, "ProjectUserRel"))
+{
+composite = arguments.memento.ProjectUserRel;
+}
+else
+{
+composite = ArrayNew(1);
+}
+setProjectUserRelMemento(composite);
+setLogUserRelisLoaded(false);
+</cfscript>
+</cffunction>
+
+<cffunction name="setPropertyMemento" access="public" returntype="void" default="void" hint="set the Property state of this object with a memento" output="false">
+<cfargument name="memento" type="struct" required="true" hint="the memento to set the state with">
+<cfscript>
+setfirstName(arguments.memento.firstName);
+setlastName(arguments.memento.lastName);
+setuserName(arguments.memento.userName);
+setpassword(arguments.memento.password);
+setemail(arguments.memento.email);
+setdateAdded(arguments.memento.dateAdded);
+</cfscript>
+</cffunction>
+
+<cffunction name="setClientUserRelMemento" access="public" returntype="void" default="void" hint="set the state of composition onetomany 'ClientUserRel'" output="false">
+<cfargument name="memento" type="array" required="true" hint="the memento to set the state with">
+<cfscript>
+var isDirty = false;
+var iterator = 0;
+var collection = ArrayNew(1);
+var idcollection = StructNew();
+var counter = 0;
+var len = 0;
+var item = 0;
+var composite = 0;
+</cfscript>
+<cflock name="transfer.user.User.ClientUserRel.#getid()#" timeout="60">
+<cfscript>
+len = ArrayLen(arguments.memento);
+for(counter = 1; counter lte len; counter = counter + 1)
+{
+composite = arguments.memento[counter];
+composite.parentUser_transferObject = getThisObject();
+item = getComposite("user.ClientUserRel", composite, "client_id");
+StructInsert(idcollection, "pk:" & item.getclient_id(), 1, true);
+StructInsert(idcollection, "obj:" & getSystem().identityHashCode(item), 1, true);
+arrayAppend(collection, item);
+}
+setClientUserRelIDCollection(idcollection);
+setClientUserRelCollection(collection);
+iterator = collection.iterator();
+while(iterator.hasNext())
+{
+item = iterator.next();
+isDirty = item.getIsDirty();
+item.setParentUser(getThisObject(), false, true);
+if(NOT isDirty)
+{
+item.getOriginalTransferObject().setIsDirty(composite.transfer_isDirty);
+item.getOriginalTransferObject().setIsPersisted(composite.transfer_isPersisted);
+}
+}
+setClientUserRelisLoaded(true);
+</cfscript>
+</cflock>
+</cffunction>
+
+<cffunction name="setProjectUserRelMemento" access="public" returntype="void" default="void" hint="set the state of composition onetomany 'ProjectUserRel'" output="false">
+<cfargument name="memento" type="array" required="true" hint="the memento to set the state with">
+<cfscript>
+var isDirty = false;
+var iterator = 0;
+var collection = ArrayNew(1);
+var idcollection = StructNew();
+var counter = 0;
+var len = 0;
+var item = 0;
+var composite = 0;
+</cfscript>
+<cflock name="transfer.user.User.ProjectUserRel.#getid()#" timeout="60">
+<cfscript>
+len = ArrayLen(arguments.memento);
+for(counter = 1; counter lte len; counter = counter + 1)
+{
+composite = arguments.memento[counter];
+composite.parentUser_transferObject = getThisObject();
+item = getComposite("user.ProjectUserRel", composite, "project_id");
+StructInsert(idcollection, "pk:" & item.getproject_id(), 1, true);
+StructInsert(idcollection, "obj:" & getSystem().identityHashCode(item), 1, true);
+arrayAppend(collection, item);
+}
+setProjectUserRelIDCollection(idcollection);
+setProjectUserRelCollection(collection);
+iterator = collection.iterator();
+while(iterator.hasNext())
+{
+item = iterator.next();
+isDirty = item.getIsDirty();
+item.setParentUser(getThisObject(), false, true);
+if(NOT isDirty)
+{
+item.getOriginalTransferObject().setIsDirty(composite.transfer_isDirty);
+item.getOriginalTransferObject().setIsPersisted(composite.transfer_isPersisted);
+}
+}
+setProjectUserRelisLoaded(true);
+</cfscript>
+</cflock>
+</cffunction>
+
+<cffunction name="setLogUserRelMemento" access="public" returntype="void" default="void" hint="set the state of composition onetomany 'LogUserRel'" output="false">
+<cfargument name="memento" type="array" required="true" hint="the memento to set the state with">
+<cfscript>
+var isDirty = false;
+var iterator = 0;
+var collection = ArrayNew(1);
+var idcollection = StructNew();
+var counter = 0;
+var len = 0;
+var item = 0;
+var composite = 0;
+</cfscript>
+<cflock name="transfer.user.User.LogUserRel.#getid()#" timeout="60">
+<cfscript>
+len = ArrayLen(arguments.memento);
+for(counter = 1; counter lte len; counter = counter + 1)
+{
+composite = arguments.memento[counter];
+composite.parentUser_transferObject = getThisObject();
+item = getComposite("user.LogUserRel", composite, "log_id");
+StructInsert(idcollection, "pk:" & item.getlog_id(), 1, true);
+StructInsert(idcollection, "obj:" & getSystem().identityHashCode(item), 1, true);
+arrayAppend(collection, item);
+}
+setLogUserRelIDCollection(idcollection);
+setLogUserRelCollection(collection);
+iterator = collection.iterator();
+while(iterator.hasNext())
+{
+item = iterator.next();
+isDirty = item.getIsDirty();
+item.setParentUser(getThisObject(), false, true);
+if(NOT isDirty)
+{
+item.getOriginalTransferObject().setIsDirty(composite.transfer_isDirty);
+item.getOriginalTransferObject().setIsPersisted(composite.transfer_isPersisted);
+}
+}
+setLogUserRelisLoaded(true);
+</cfscript>
+</cflock>
+</cffunction>
+
+<cffunction name="getMemento" access="public" returntype="struct" default="struct" hint="Returns the memento for all non-lazy members of this object" output="false">
+<cfscript>
+var memento = StructNew();
+memento.id = getid();
+memento.transfer_isDirty = getIsDirty();
+memento.transfer_isPersisted = getIsPersisted();
+StructAppend(memento, getPropertyMemento());
+memento.ClientUserRel = getClientUserRelMemento();
+memento.ProjectUserRel = getProjectUserRelMemento();
+return memento;
+</cfscript>
+</cffunction>
+
+<cffunction name="getPropertyMemento" access="public" returntype="struct" default="struct" hint="returns the memento for properties" output="false">
+<cfscript>
+var memento = StructNew();
+memento.firstName = getfirstName();
+memento.lastName = getlastName();
+memento.userName = getuserName();
+memento.password = getpassword();
+memento.email = getemail();
+memento.dateAdded = getdateAdded();
+return memento;
+</cfscript>
+</cffunction>
+
+<cffunction name="getClientUserRelMemento" access="public" returntype="array" default="array" hint="returns the memento for the onetomany ClientUserRel" output="false">
+<cfscript>
+var memento = ArrayNew(1);
+var iterator = getClientUserRelIterator();
+var item = 0;
+while(iterator.hasNext())
+{
+item = iterator.next();
+ArrayAppend(memento, item.getMemento());
+}
+return memento;
+</cfscript>
+</cffunction>
+
+<cffunction name="getProjectUserRelMemento" access="public" returntype="array" default="array" hint="returns the memento for the onetomany ProjectUserRel" output="false">
+<cfscript>
+var memento = ArrayNew(1);
+var iterator = getProjectUserRelIterator();
+var item = 0;
+while(iterator.hasNext())
+{
+item = iterator.next();
+ArrayAppend(memento, item.getMemento());
+}
+return memento;
+</cfscript>
+</cffunction>
+
+<cffunction name="getLogUserRelMemento" access="public" returntype="array" default="array" hint="returns the memento for the onetomany LogUserRel" output="false">
+<cfscript>
+var memento = ArrayNew(1);
+var iterator = getLogUserRelIterator();
+var item = 0;
+while(iterator.hasNext())
+{
+item = iterator.next();
+ArrayAppend(memento, item.getMemento());
+}
+return memento;
+</cfscript>
+</cffunction>
+
+<cffunction name="copyValuesTo" access="public" returntype="void" default="void" hint="Copies the values of this object to one of the same class" output="false">
+<cfargument name="transfer" type="transfer.com.TransferObject" required="true" hint="The object to copy values to">
+<cfscript>
+if(arguments.transfer.getClassName() neq "user.User")
+{
+throw("InvalidTransferClassException","The supplied Transfer class was not the one specified in the configuration file ","The Transfer class of '#arguments.transfer.getClassName()#' does not match the expected class of 'user.User'");
+}
+arguments.transfer.setMemento(getMemento());
+if(getLogUserRelisLoaded())
+{
+arguments.transfer.setLogUserRelMemento(getLogUserRelMemento());
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="getClientUserRelCollection" access="private" returntype="array" default="array" hint="Accessor for the internal collection for ClientUserRel" output="false">
+<cfscript>
+return instance.ClientUserRel;
+</cfscript>
+</cffunction>
+
+<cffunction name="setClientUserRelCollection" access="private" returntype="void" default="void" hint="Mutator for the internal collection for ClientUserRel" output="false">
+<cfargument name="ClientUserRel" type="array" required="true" hint="The array to set">
+<cfscript>
+instance.ClientUserRel = arguments.ClientUserRel;
+</cfscript>
+</cffunction>
+
+<cffunction name="getClientUserRelIDCollection" access="private" returntype="struct" default="struct" hint="Accessor for internal id collection, for faster contain*() calls" output="false">
+<cfreturn instance.ClientUserRelIDCollection />
+</cffunction>
+
+<cffunction name="setClientUserRelIDCollection" access="private" returntype="void" default="void" hint="Mutator for internal id collection, for faster contain*() calls" output="false">
+<cfargument name="collection" type="struct" required="true" hint="the key for the id to be stored under">
+<cfset instance.ClientUserRelIDCollection = arguments.collection />
+</cffunction>
+
+<cffunction name="getClientUserRel" access="public" returntype="transfer.com.TransferObject" default="transfer.com.TransferObject" hint="Returns the user.ClientUserRel object at the given index in the array" output="false">
+<cfargument name="index" type="numeric" required="true" hint="The index in the array to retrieve">
+<cfscript>
+if(NOT getClientUserRelisLoaded())
+{
+loadClientUserRel();
+}
+return getClientUserRelCollection().get(JavaCast("int", arguments.index - 1));
+</cfscript>
+</cffunction>
+
+<cffunction name="getClientUserRelArray" access="public" returntype="array" default="array" hint="returns the entire array of user.ClientUserRel" output="false">
+<cfscript>
+var array = ArrayNew(1);
+if(NOT getClientUserRelisLoaded())
+{
+loadClientUserRel();
+}
+array.addAll(getClientUserRelCollection());
+return array;
+</cfscript>
+</cffunction>
+
+<cffunction name="getClientUserRelIterator" access="public" returntype="any" default="any" hint="return a java.util.Iterator of user.ClientUserRel objects" output="false">
+<cfscript>
+if(NOT getClientUserRelisLoaded())
+{
+loadClientUserRel();
+}
+return getClientUserRelArray().iterator();
+</cfscript>
+</cffunction>
+
+<cffunction name="containsClientUserRel" access="public" returntype="boolean" default="boolean" hint="If this array contains a particular instance of user.ClientUserRel" output="false">
+<cfargument name="object" type="transfer.com.TransferObject" required="true" hint="The object to look for">
+<cfargument name="pkCheckOnly" type="boolean" required="false" hint="Expert/Transfer use only: only checks primary keys" default="false">
+<cfscript>
+var composite = 0;
+var array = getClientUserRelArray();
+var counter = 1;
+var len = 0;
+var check = false;
+var idcollection = getClientUserRelidCollection();
+if(arguments.object.getClassName() neq "user.ClientUserRel")
+{
+throw("InvalidTransferClassException","The supplied Transfer class was not the one specified in the configuration file ","The Transfer class of '#arguments.object.getClassName()#' does not match the expected class of 'user.ClientUserRel'");
+}
+if(arguments.object.getIsPersisted() AND StructKeyExists(idcollection, "pk:" & arguments.object.getclient_id()))
+{
+return true;
+}
+if(arguments.pkCheckOnly)
+{
+return false;
+}
+if(StructKeyExists(idcollection, "obj:" & getSystem().identityHashCode(arguments.object)))
+{
+check = true;
+}
+if(NOT check)
+{
+len = ArrayLen(array);
+for(; counter lte len; counter = counter + 1)
+{
+composite = array[counter];
+if(composite.equalsTransfer(arguments.object))
+{
+check = true;
+break;
+}
+}
+}
+if(check AND arguments.object.getIsPersisted())
+{
+StructInsert(idcollection, "pk:" & arguments.object.getclient_id(), 1, true);
+}
+return check;
+</cfscript>
+</cffunction>
+
+<cffunction name="findClientUserRel" access="public" returntype="numeric" default="numeric" hint="Find the index number that the given object is at in the Array. Returns -1 if it can't be found.'" output="false">
+<cfargument name="object" type="transfer.com.TransferObject" required="true" hint="The object to search for">
+<cfscript>
+var iterator = 0;
+var composite = 0;
+var counter = 0;
+if(NOT getClientUserRelisLoaded())
+{
+loadClientUserRel();
+}
+iterator = getClientUserRelCollection().iterator();
+if(arguments.object.getClassName() neq "user.ClientUserRel")
+{
+throw("InvalidTransferClassException","The supplied Transfer class was not the one specified in the configuration file ","The Transfer class of '#arguments.object.getClassName()#' does not match the expected class of 'user.ClientUserRel'");
+}
+while(iterator.hasNext())
+{
+composite = iterator.next();
+counter = counter + 1;
+if(composite.equalsTransfer(arguments.object))
+{
+return counter;
+}
+}
+return -1;
+</cfscript>
+</cffunction>
+
+<cffunction name="addClientUserRel" access="package" returntype="void" default="void" hint="Add an object of type user.ClientUserRel to the array" output="false">
+<cfargument name="object" type="transfer.com.TransferObject" required="true" hint="The object to add">
+<cflock name="transfer.user.User.ClientUserRel.#getid()#" timeout="60">
+<cfscript>
+if(arguments.object.getClassName() neq "user.ClientUserRel")
+{
+throw("InvalidTransferClassException","The supplied Transfer class was not the one specified in the configuration file ","The Transfer class of '#arguments.object.getClassName()#' does not match the expected class of 'user.ClientUserRel'");
+}
+if(NOT getClientUserRelisLoaded())
+{
+loadClientUserRel();
+}
+if(arguments.object.getIsPersisted())
+{
+StructInsert(getClientUserRelIDCollection(), "pk:" & arguments.object.getclient_id(), 1, true);
+}
+StructInsert(getClientUserRelIDCollection(), "obj:" & getSystem().identityHashCode(arguments.object), 1, true);
+ArrayAppend(getClientUserRelCollection(), arguments.object);
+</cfscript>
+</cflock>
+</cffunction>
+
+<cffunction name="removeClientUserRel" access="package" returntype="void" default="void" hint="remove an object of type user.ClientUserRel from the array" output="false">
+<cfargument name="object" type="transfer.com.TransferObject" required="true" hint="the object to remove">
+<cfscript>
+var iterator = 0;
+var composite = 0;
+if(arguments.object.getClassName() neq "user.ClientUserRel")
+{
+throw("InvalidTransferClassException","The supplied Transfer class was not the one specified in the configuration file ","The Transfer class of '#arguments.object.getClassName()#' does not match the expected class of 'user.ClientUserRel'");
+}
+</cfscript>
+<cflock name="transfer.user.User.ClientUserRel.#getid()#" timeout="60">
+<cfscript>
+if(NOT getClientUserRelisLoaded())
+{
+loadClientUserRel();
+}
+iterator = getClientUserRelCollection().iterator();
+while(iterator.hasNext())
+{
+composite = iterator.next();
+if(composite.equalsTransfer(arguments.object))
+{
+iterator.remove();
+if(arguments.object.getIsPersisted())
+{
+StructDelete(getClientUserRelIDCollection(), "pk:" & arguments.object.getclient_id());
+}
+StructDelete(getClientUserRelIDCollection(), "obj:" & getSystem().identityHashCode(arguments.object));
+return;
+}
+}
+</cfscript>
+</cflock>
+</cffunction>
+
+<cffunction name="clearClientUserRel" access="package" returntype="void" default="void" hint="Clear all the elements from the array" output="false">
+<cflock name="transfer.user.User.ClientUserRel.#getid()#" timeout="60">
+<cfscript>
+ArrayClear(getClientUserRelCollection());
+StructClear(getClientUserRelIDCollection());
+</cfscript>
+</cflock>
+</cffunction>
+
+<cffunction name="sortClientUserRel" access="public" returntype="void" default="void" hint="Sort all elements in the array ClientUserRel" output="false">
+<cflock name="transfer.user.User.ClientUserRel.#getid()#" timeout="60">
+<cfscript>
+if(NOT arrayisEmpty(getClientUserRelCollection()))
+{
+setClientUserRelCollection(getUtility().quickSort(getClientUserRelCollection(), ClientUserRelComparator));
+}
+</cfscript>
+</cflock>
+</cffunction>
+
+<cffunction name="ClientUserRelComparator" access="private" returntype="numeric" default="numeric" hint="The Comparator HOF for sorting" output="false">
+<cfargument name="object1" type="transfer.com.TransferObject" required="true" hint="object one">
+<cfargument name="object2" type="transfer.com.TransferObject" required="true" hint="object two">
+<cfscript>
+if(arguments.object1.getuser_id() lt arguments.object2.getuser_id())
+{
+return -1;
+}
+else if(arguments.object1.getuser_id() gt arguments.object2.getuser_id())
+{
+return 1;
+}
+return 0;
+</cfscript>
+</cffunction>
+
+<cffunction name="getProjectUserRelCollection" access="private" returntype="array" default="array" hint="Accessor for the internal collection for ProjectUserRel" output="false">
+<cfscript>
+return instance.ProjectUserRel;
+</cfscript>
+</cffunction>
+
+<cffunction name="setProjectUserRelCollection" access="private" returntype="void" default="void" hint="Mutator for the internal collection for ProjectUserRel" output="false">
+<cfargument name="ProjectUserRel" type="array" required="true" hint="The array to set">
+<cfscript>
+instance.ProjectUserRel = arguments.ProjectUserRel;
+</cfscript>
+</cffunction>
+
+<cffunction name="getProjectUserRelIDCollection" access="private" returntype="struct" default="struct" hint="Accessor for internal id collection, for faster contain*() calls" output="false">
+<cfreturn instance.ProjectUserRelIDCollection />
+</cffunction>
+
+<cffunction name="setProjectUserRelIDCollection" access="private" returntype="void" default="void" hint="Mutator for internal id collection, for faster contain*() calls" output="false">
+<cfargument name="collection" type="struct" required="true" hint="the key for the id to be stored under">
+<cfset instance.ProjectUserRelIDCollection = arguments.collection />
+</cffunction>
+
+<cffunction name="getProjectUserRel" access="public" returntype="transfer.com.TransferObject" default="transfer.com.TransferObject" hint="Returns the user.ProjectUserRel object at the given index in the array" output="false">
+<cfargument name="index" type="numeric" required="true" hint="The index in the array to retrieve">
+<cfscript>
+if(NOT getProjectUserRelisLoaded())
+{
+loadProjectUserRel();
+}
+return getProjectUserRelCollection().get(JavaCast("int", arguments.index - 1));
+</cfscript>
+</cffunction>
+
+<cffunction name="getProjectUserRelArray" access="public" returntype="array" default="array" hint="returns the entire array of user.ProjectUserRel" output="false">
+<cfscript>
+var array = ArrayNew(1);
+if(NOT getProjectUserRelisLoaded())
+{
+loadProjectUserRel();
+}
+array.addAll(getProjectUserRelCollection());
+return array;
+</cfscript>
+</cffunction>
+
+<cffunction name="getProjectUserRelIterator" access="public" returntype="any" default="any" hint="return a java.util.Iterator of user.ProjectUserRel objects" output="false">
+<cfscript>
+if(NOT getProjectUserRelisLoaded())
+{
+loadProjectUserRel();
+}
+return getProjectUserRelArray().iterator();
+</cfscript>
+</cffunction>
+
+<cffunction name="containsProjectUserRel" access="public" returntype="boolean" default="boolean" hint="If this array contains a particular instance of user.ProjectUserRel" output="false">
+<cfargument name="object" type="transfer.com.TransferObject" required="true" hint="The object to look for">
+<cfargument name="pkCheckOnly" type="boolean" required="false" hint="Expert/Transfer use only: only checks primary keys" default="false">
+<cfscript>
+var composite = 0;
+var array = getProjectUserRelArray();
+var counter = 1;
+var len = 0;
+var check = false;
+var idcollection = getProjectUserRelidCollection();
+if(arguments.object.getClassName() neq "user.ProjectUserRel")
+{
+throw("InvalidTransferClassException","The supplied Transfer class was not the one specified in the configuration file ","The Transfer class of '#arguments.object.getClassName()#' does not match the expected class of 'user.ProjectUserRel'");
+}
+if(arguments.object.getIsPersisted() AND StructKeyExists(idcollection, "pk:" & arguments.object.getproject_id()))
+{
+return true;
+}
+if(arguments.pkCheckOnly)
+{
+return false;
+}
+if(StructKeyExists(idcollection, "obj:" & getSystem().identityHashCode(arguments.object)))
+{
+check = true;
+}
+if(NOT check)
+{
+len = ArrayLen(array);
+for(; counter lte len; counter = counter + 1)
+{
+composite = array[counter];
+if(composite.equalsTransfer(arguments.object))
+{
+check = true;
+break;
+}
+}
+}
+if(check AND arguments.object.getIsPersisted())
+{
+StructInsert(idcollection, "pk:" & arguments.object.getproject_id(), 1, true);
+}
+return check;
+</cfscript>
+</cffunction>
+
+<cffunction name="findProjectUserRel" access="public" returntype="numeric" default="numeric" hint="Find the index number that the given object is at in the Array. Returns -1 if it can't be found.'" output="false">
+<cfargument name="object" type="transfer.com.TransferObject" required="true" hint="The object to search for">
+<cfscript>
+var iterator = 0;
+var composite = 0;
+var counter = 0;
+if(NOT getProjectUserRelisLoaded())
+{
+loadProjectUserRel();
+}
+iterator = getProjectUserRelCollection().iterator();
+if(arguments.object.getClassName() neq "user.ProjectUserRel")
+{
+throw("InvalidTransferClassException","The supplied Transfer class was not the one specified in the configuration file ","The Transfer class of '#arguments.object.getClassName()#' does not match the expected class of 'user.ProjectUserRel'");
+}
+while(iterator.hasNext())
+{
+composite = iterator.next();
+counter = counter + 1;
+if(composite.equalsTransfer(arguments.object))
+{
+return counter;
+}
+}
+return -1;
+</cfscript>
+</cffunction>
+
+<cffunction name="addProjectUserRel" access="package" returntype="void" default="void" hint="Add an object of type user.ProjectUserRel to the array" output="false">
+<cfargument name="object" type="transfer.com.TransferObject" required="true" hint="The object to add">
+<cflock name="transfer.user.User.ProjectUserRel.#getid()#" timeout="60">
+<cfscript>
+if(arguments.object.getClassName() neq "user.ProjectUserRel")
+{
+throw("InvalidTransferClassException","The supplied Transfer class was not the one specified in the configuration file ","The Transfer class of '#arguments.object.getClassName()#' does not match the expected class of 'user.ProjectUserRel'");
+}
+if(NOT getProjectUserRelisLoaded())
+{
+loadProjectUserRel();
+}
+if(arguments.object.getIsPersisted())
+{
+StructInsert(getProjectUserRelIDCollection(), "pk:" & arguments.object.getproject_id(), 1, true);
+}
+StructInsert(getProjectUserRelIDCollection(), "obj:" & getSystem().identityHashCode(arguments.object), 1, true);
+ArrayAppend(getProjectUserRelCollection(), arguments.object);
+</cfscript>
+</cflock>
+</cffunction>
+
+<cffunction name="removeProjectUserRel" access="package" returntype="void" default="void" hint="remove an object of type user.ProjectUserRel from the array" output="false">
+<cfargument name="object" type="transfer.com.TransferObject" required="true" hint="the object to remove">
+<cfscript>
+var iterator = 0;
+var composite = 0;
+if(arguments.object.getClassName() neq "user.ProjectUserRel")
+{
+throw("InvalidTransferClassException","The supplied Transfer class was not the one specified in the configuration file ","The Transfer class of '#arguments.object.getClassName()#' does not match the expected class of 'user.ProjectUserRel'");
+}
+</cfscript>
+<cflock name="transfer.user.User.ProjectUserRel.#getid()#" timeout="60">
+<cfscript>
+if(NOT getProjectUserRelisLoaded())
+{
+loadProjectUserRel();
+}
+iterator = getProjectUserRelCollection().iterator();
+while(iterator.hasNext())
+{
+composite = iterator.next();
+if(composite.equalsTransfer(arguments.object))
+{
+iterator.remove();
+if(arguments.object.getIsPersisted())
+{
+StructDelete(getProjectUserRelIDCollection(), "pk:" & arguments.object.getproject_id());
+}
+StructDelete(getProjectUserRelIDCollection(), "obj:" & getSystem().identityHashCode(arguments.object));
+return;
+}
+}
+</cfscript>
+</cflock>
+</cffunction>
+
+<cffunction name="clearProjectUserRel" access="package" returntype="void" default="void" hint="Clear all the elements from the array" output="false">
+<cflock name="transfer.user.User.ProjectUserRel.#getid()#" timeout="60">
+<cfscript>
+ArrayClear(getProjectUserRelCollection());
+StructClear(getProjectUserRelIDCollection());
+</cfscript>
+</cflock>
+</cffunction>
+
+<cffunction name="sortProjectUserRel" access="public" returntype="void" default="void" hint="Sort all elements in the array ProjectUserRel" output="false">
+<cflock name="transfer.user.User.ProjectUserRel.#getid()#" timeout="60">
+<cfscript>
+if(NOT arrayisEmpty(getProjectUserRelCollection()))
+{
+setProjectUserRelCollection(getUtility().quickSort(getProjectUserRelCollection(), ProjectUserRelComparator));
+}
+</cfscript>
+</cflock>
+</cffunction>
+
+<cffunction name="ProjectUserRelComparator" access="private" returntype="numeric" default="numeric" hint="The Comparator HOF for sorting" output="false">
+<cfargument name="object1" type="transfer.com.TransferObject" required="true" hint="object one">
+<cfargument name="object2" type="transfer.com.TransferObject" required="true" hint="object two">
+<cfscript>
+if(arguments.object1.getproject_id() lt arguments.object2.getproject_id())
+{
+return -1;
+}
+else if(arguments.object1.getproject_id() gt arguments.object2.getproject_id())
+{
+return 1;
+}
+return 0;
+</cfscript>
+</cffunction>
+
+<cffunction name="getLogUserRelCollection" access="private" returntype="array" default="array" hint="Accessor for the internal collection for LogUserRel" output="false">
+<cfscript>
+return instance.LogUserRel;
+</cfscript>
+</cffunction>
+
+<cffunction name="setLogUserRelCollection" access="private" returntype="void" default="void" hint="Mutator for the internal collection for LogUserRel" output="false">
+<cfargument name="LogUserRel" type="array" required="true" hint="The array to set">
+<cfscript>
+instance.LogUserRel = arguments.LogUserRel;
+</cfscript>
+</cffunction>
+
+<cffunction name="getLogUserRelIDCollection" access="private" returntype="struct" default="struct" hint="Accessor for internal id collection, for faster contain*() calls" output="false">
+<cfreturn instance.LogUserRelIDCollection />
+</cffunction>
+
+<cffunction name="setLogUserRelIDCollection" access="private" returntype="void" default="void" hint="Mutator for internal id collection, for faster contain*() calls" output="false">
+<cfargument name="collection" type="struct" required="true" hint="the key for the id to be stored under">
+<cfset instance.LogUserRelIDCollection = arguments.collection />
+</cffunction>
+
+<cffunction name="getLogUserRel" access="public" returntype="transfer.com.TransferObject" default="transfer.com.TransferObject" hint="Returns the user.LogUserRel object at the given index in the array" output="false">
+<cfargument name="index" type="numeric" required="true" hint="The index in the array to retrieve">
+<cfscript>
+if(NOT getLogUserRelisLoaded())
+{
+loadLogUserRel();
+}
+return getLogUserRelCollection().get(JavaCast("int", arguments.index - 1));
+</cfscript>
+</cffunction>
+
+<cffunction name="getLogUserRelArray" access="public" returntype="array" default="array" hint="returns the entire array of user.LogUserRel" output="false">
+<cfscript>
+var array = ArrayNew(1);
+if(NOT getLogUserRelisLoaded())
+{
+loadLogUserRel();
+}
+array.addAll(getLogUserRelCollection());
+return array;
+</cfscript>
+</cffunction>
+
+<cffunction name="getLogUserRelIterator" access="public" returntype="any" default="any" hint="return a java.util.Iterator of user.LogUserRel objects" output="false">
+<cfscript>
+if(NOT getLogUserRelisLoaded())
+{
+loadLogUserRel();
+}
+return getLogUserRelArray().iterator();
+</cfscript>
+</cffunction>
+
+<cffunction name="containsLogUserRel" access="public" returntype="boolean" default="boolean" hint="If this array contains a particular instance of user.LogUserRel" output="false">
+<cfargument name="object" type="transfer.com.TransferObject" required="true" hint="The object to look for">
+<cfargument name="pkCheckOnly" type="boolean" required="false" hint="Expert/Transfer use only: only checks primary keys" default="false">
+<cfscript>
+var composite = 0;
+var array = getLogUserRelArray();
+var counter = 1;
+var len = 0;
+var check = false;
+var idcollection = getLogUserRelidCollection();
+if(arguments.object.getClassName() neq "user.LogUserRel")
+{
+throw("InvalidTransferClassException","The supplied Transfer class was not the one specified in the configuration file ","The Transfer class of '#arguments.object.getClassName()#' does not match the expected class of 'user.LogUserRel'");
+}
+if(arguments.object.getIsPersisted() AND StructKeyExists(idcollection, "pk:" & arguments.object.getlog_id()))
+{
+return true;
+}
+if(arguments.pkCheckOnly)
+{
+return false;
+}
+if(StructKeyExists(idcollection, "obj:" & getSystem().identityHashCode(arguments.object)))
+{
+check = true;
+}
+if(NOT check)
+{
+len = ArrayLen(array);
+for(; counter lte len; counter = counter + 1)
+{
+composite = array[counter];
+if(composite.equalsTransfer(arguments.object))
+{
+check = true;
+break;
+}
+}
+}
+if(check AND arguments.object.getIsPersisted())
+{
+StructInsert(idcollection, "pk:" & arguments.object.getlog_id(), 1, true);
+}
+return check;
+</cfscript>
+</cffunction>
+
+<cffunction name="findLogUserRel" access="public" returntype="numeric" default="numeric" hint="Find the index number that the given object is at in the Array. Returns -1 if it can't be found.'" output="false">
+<cfargument name="object" type="transfer.com.TransferObject" required="true" hint="The object to search for">
+<cfscript>
+var iterator = 0;
+var composite = 0;
+var counter = 0;
+if(NOT getLogUserRelisLoaded())
+{
+loadLogUserRel();
+}
+iterator = getLogUserRelCollection().iterator();
+if(arguments.object.getClassName() neq "user.LogUserRel")
+{
+throw("InvalidTransferClassException","The supplied Transfer class was not the one specified in the configuration file ","The Transfer class of '#arguments.object.getClassName()#' does not match the expected class of 'user.LogUserRel'");
+}
+while(iterator.hasNext())
+{
+composite = iterator.next();
+counter = counter + 1;
+if(composite.equalsTransfer(arguments.object))
+{
+return counter;
+}
+}
+return -1;
+</cfscript>
+</cffunction>
+
+<cffunction name="addLogUserRel" access="package" returntype="void" default="void" hint="Add an object of type user.LogUserRel to the array" output="false">
+<cfargument name="object" type="transfer.com.TransferObject" required="true" hint="The object to add">
+<cflock name="transfer.user.User.LogUserRel.#getid()#" timeout="60">
+<cfscript>
+if(arguments.object.getClassName() neq "user.LogUserRel")
+{
+throw("InvalidTransferClassException","The supplied Transfer class was not the one specified in the configuration file ","The Transfer class of '#arguments.object.getClassName()#' does not match the expected class of 'user.LogUserRel'");
+}
+if(NOT getLogUserRelisLoaded())
+{
+loadLogUserRel();
+}
+if(arguments.object.getIsPersisted())
+{
+StructInsert(getLogUserRelIDCollection(), "pk:" & arguments.object.getlog_id(), 1, true);
+}
+StructInsert(getLogUserRelIDCollection(), "obj:" & getSystem().identityHashCode(arguments.object), 1, true);
+ArrayAppend(getLogUserRelCollection(), arguments.object);
+</cfscript>
+</cflock>
+</cffunction>
+
+<cffunction name="removeLogUserRel" access="package" returntype="void" default="void" hint="remove an object of type user.LogUserRel from the array" output="false">
+<cfargument name="object" type="transfer.com.TransferObject" required="true" hint="the object to remove">
+<cfscript>
+var iterator = 0;
+var composite = 0;
+if(arguments.object.getClassName() neq "user.LogUserRel")
+{
+throw("InvalidTransferClassException","The supplied Transfer class was not the one specified in the configuration file ","The Transfer class of '#arguments.object.getClassName()#' does not match the expected class of 'user.LogUserRel'");
+}
+</cfscript>
+<cflock name="transfer.user.User.LogUserRel.#getid()#" timeout="60">
+<cfscript>
+if(NOT getLogUserRelisLoaded())
+{
+loadLogUserRel();
+}
+iterator = getLogUserRelCollection().iterator();
+while(iterator.hasNext())
+{
+composite = iterator.next();
+if(composite.equalsTransfer(arguments.object))
+{
+iterator.remove();
+if(arguments.object.getIsPersisted())
+{
+StructDelete(getLogUserRelIDCollection(), "pk:" & arguments.object.getlog_id());
+}
+StructDelete(getLogUserRelIDCollection(), "obj:" & getSystem().identityHashCode(arguments.object));
+return;
+}
+}
+</cfscript>
+</cflock>
+</cffunction>
+
+<cffunction name="clearLogUserRel" access="package" returntype="void" default="void" hint="Clear all the elements from the array" output="false">
+<cflock name="transfer.user.User.LogUserRel.#getid()#" timeout="60">
+<cfscript>
+ArrayClear(getLogUserRelCollection());
+StructClear(getLogUserRelIDCollection());
+</cfscript>
+</cflock>
+</cffunction>
+
+<cffunction name="sortLogUserRel" access="public" returntype="void" default="void" hint="Sort all elements in the array LogUserRel" output="false">
+<cflock name="transfer.user.User.LogUserRel.#getid()#" timeout="60">
+<cfscript>
+if(NOT arrayisEmpty(getLogUserRelCollection()))
+{
+setLogUserRelCollection(getUtility().quickSort(getLogUserRelCollection(), LogUserRelComparator));
+}
+</cfscript>
+</cflock>
+</cffunction>
+
+<cffunction name="LogUserRelComparator" access="private" returntype="numeric" default="numeric" hint="The Comparator HOF for sorting" output="false">
+<cfargument name="object1" type="transfer.com.TransferObject" required="true" hint="object one">
+<cfargument name="object2" type="transfer.com.TransferObject" required="true" hint="object two">
+<cfscript>
+if(arguments.object1.getlogDate() lt arguments.object2.getlogDate())
+{
+return 1;
+}
+else if(arguments.object1.getlogDate() gt arguments.object2.getlogDate())
+{
+return -1;
+}
+return 0;
+</cfscript>
+</cffunction>
+
+<cffunction name="validateCacheState" access="package" returntype="boolean" default="boolean" hint="if this object is cached, then validate that all it's composites are cached too" output="false">
+<cfscript>
+var iterator = 0;
+var item = 0;
+if(getIsPersisted() AND NOT getTransfer().validateIsCached(getThisObject()))
+{
+return true;
+}
+return true;
+</cfscript>
+</cffunction>
+
+<cffunction name="actionAfterCreateTransferEvent" access="public" returntype="void" default="void" hint="Observer action method for when creates occur" output="false">
+<cfargument name="event" type="transfer.com.events.TransferEvent" required="true" hint="The Transfer Event Object">
+<cfscript>
+var className = arguments.event.getTransferObject().getClassName();
+if(className eq "user.ClientUserRel")
+{
+if(arguments.event.getTransferObject().hasParentUser())
+{
+if(arguments.event.getTransferObject().getParentUser().equalsTransfer(getThisObject()))
+{
+if(NOT containsClientUserRel(arguments.event.getTransferObject()))
+{
+arguments.event.getTransferObject().setParentUser(getThisObject());
+}
+sortClientUserRel();
+}
+}
+}
+else if(className eq "user.ProjectUserRel")
+{
+if(arguments.event.getTransferObject().hasParentUser())
+{
+if(arguments.event.getTransferObject().getParentUser().equalsTransfer(getThisObject()))
+{
+if(NOT containsProjectUserRel(arguments.event.getTransferObject()))
+{
+arguments.event.getTransferObject().setParentUser(getThisObject());
+}
+sortProjectUserRel();
+}
+}
+}
+else if(className eq "user.LogUserRel")
+{
+if(arguments.event.getTransferObject().hasParentUser())
+{
+if(arguments.event.getTransferObject().getParentUser().equalsTransfer(getThisObject()))
+{
+if(NOT containsLogUserRel(arguments.event.getTransferObject()))
+{
+arguments.event.getTransferObject().setParentUser(getThisObject());
+}
+sortLogUserRel();
+}
+}
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="actionAfterDeleteTransferEvent" access="public" returntype="void" default="void" hint="Observer action method for when deletes occur" output="false">
+<cfargument name="event" type="transfer.com.events.TransferEvent" required="true" hint="The Transfer Event Object">
+<cfscript>
+var className = arguments.event.getTransferObject().getClassName();
+if(className eq "user.ClientUserRel")
+{
+if(getClientUserRelIsLoaded() AND containsClientUserRel(arguments.event.getTransferObject()))
+{
+removeClientUserRel(arguments.event.getTransferObject());
+}
+}
+else if(className eq "user.ProjectUserRel")
+{
+if(getProjectUserRelIsLoaded() AND containsProjectUserRel(arguments.event.getTransferObject()))
+{
+removeProjectUserRel(arguments.event.getTransferObject());
+}
+}
+else if(className eq "user.LogUserRel")
+{
+if(getLogUserRelIsLoaded() AND containsLogUserRel(arguments.event.getTransferObject()))
+{
+removeLogUserRel(arguments.event.getTransferObject());
+}
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="actionAfterUpdateTransferEvent" access="public" returntype="void" default="void" hint="Observer method action for when updates occur" output="false">
+<cfargument name="event" type="transfer.com.events.TransferEvent" required="true" hint="The Transfer Event Object">
+<cfscript>
+var className = arguments.event.getTransferObject().getClassName();
+if(className eq "user.ClientUserRel")
+{
+if(arguments.event.getTransferObject().hasParentUser())
+{
+if(arguments.event.getTransferObject().getParentUser().equalsTransfer(getThisObject()))
+{
+if(NOT containsClientUserRel(arguments.event.getTransferObject()))
+{
+arguments.event.getTransferObject().setParentUser(getThisObject());
+}
+sortClientUserRel();
+}
+}
+}
+else if(className eq "user.ProjectUserRel")
+{
+if(arguments.event.getTransferObject().hasParentUser())
+{
+if(arguments.event.getTransferObject().getParentUser().equalsTransfer(getThisObject()))
+{
+if(NOT containsProjectUserRel(arguments.event.getTransferObject()))
+{
+arguments.event.getTransferObject().setParentUser(getThisObject());
+}
+sortProjectUserRel();
+}
+}
+}
+else if(className eq "user.LogUserRel")
+{
+if(arguments.event.getTransferObject().hasParentUser())
+{
+if(arguments.event.getTransferObject().getParentUser().equalsTransfer(getThisObject()))
+{
+if(NOT containsLogUserRel(arguments.event.getTransferObject()))
+{
+arguments.event.getTransferObject().setParentUser(getThisObject());
+}
+sortLogUserRel();
+}
+}
+}
+</cfscript>
+</cffunction>
+
+<cffunction name="actionAfterDiscardTransferEvent" access="public" returntype="void" default="void" hint="Observer action method for when discards occur" output="false">
+<cfargument name="event" type="transfer.com.events.TransferEvent" required="true" hint="The Transfer Event Object">
+<cfscript>
+var discard = false;
+var className = arguments.event.getTransferObject().getClassName();
+if(className eq "user.ClientUserRel")
+{
+if(arguments.event.getTransferObject().getOriginalTransferObject().getParentUserisLoaded() AND arguments.event.getTransferObject().hasParentUser() AND arguments.event.getTransferObject().getParentUser().equalsTransfer(getThisObject())
+AND
+containsClientUserRel(arguments.event.getTransferObject()))
+{
+discard = true;
+}
+}
+else if(className eq "user.ProjectUserRel")
+{
+if(arguments.event.getTransferObject().getOriginalTransferObject().getParentUserisLoaded() AND arguments.event.getTransferObject().hasParentUser() AND arguments.event.getTransferObject().getParentUser().equalsTransfer(getThisObject())
+AND
+containsProjectUserRel(arguments.event.getTransferObject()))
+{
+discard = true;
+}
+}
+else if(className eq "user.LogUserRel")
+{
+if(arguments.event.getTransferObject().getOriginalTransferObject().getParentUserisLoaded() AND arguments.event.getTransferObject().hasParentUser() AND arguments.event.getTransferObject().getParentUser().equalsTransfer(getThisObject())
+AND
+containsLogUserRel(arguments.event.getTransferObject()))
+{
+discard = true;
+}
+}
+if(discard)
+{
+getTransfer().discard(getThisObject());
+}
+</cfscript>
+</cffunction>
+
+
